@@ -15,13 +15,13 @@ tactics:
 relevantTechniques:
 query: |
   CommonSecurityLog
-| where DeviceProduct == "IronDefense"
-| summarize arg_max(TimeGenerated, *) by DeviceCustomString4, DeviceCustomString2
-| extend Category = extract(@'cat=([^;]+)(\;|$)', 1, AdditionalExtensions)
-| extend Subcategory = extract(@'subcat=([^;]+)(\;|$)', 1, AdditionalExtensions)
-| extend AlertDescription = strcat(Category, ': ', Subcategory)
-| extend Status = tostring(DeviceCustomString2)
-| extend IronVueUrl = tostring(DeviceCustomString3)
+  | where DeviceProduct == "IronDefense"
+  | summarize arg_max(TimeGenerated, *) by DeviceCustomString4, DeviceCustomString2
+  | extend Category = extract(@'cat=([^;]+)(\;|$)', 1, AdditionalExtensions)
+  | extend Subcategory = extract(@'subcat=([^;]+)(\;|$)', 1, AdditionalExtensions)
+  | extend AlertDescription = strcat(Category, ': ', Subcategory)
+  | extend Status = DeviceCustomString2
+  | extend IronVueUrl = replace(@'\\', @'', DeviceCustomString3)
 entityMappings:
   - entityType: IP
     fieldMappings:
@@ -50,3 +50,4 @@ customDetails:
   IronVueUrl: IronVueUrl
   IronDefenseAlertId: DeviceCustomString4
   AnalystSeverity: DeviceCustomString1
+version: 1.0.0
