@@ -618,7 +618,7 @@ foreach ($inputFile in $(Get-ChildItem $path)) {
                             $connectorObj = [PSCustomObject]@{
                                 id         = "[variables('_connector$connectorCounter-source')]";
                                 name       = "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/',parameters('connector$connectorCounter-name'))]"
-                                apiVersion = "2021-03-01-preview";
+                                apiVersion = "2022-11-01";
                                 type       = "Microsoft.OperationalInsights/workspaces/providers/dataConnectors";
                                 location   = "[parameters('workspace-location')]";
                                 kind       = "GenericUI";
@@ -650,7 +650,7 @@ foreach ($inputFile in $(Get-ChildItem $path)) {
                             $connectorObj = [PSCustomObject]@{
                                 id         = "[variables('_connector$connectorCounter-source')]";
                                 name       = "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/',parameters('connector$connectorCounter-name'))]"
-                                apiVersion = "2021-03-01-preview";
+                                apiVersion = "2022-11-01";
                                 type       = "Microsoft.OperationalInsights/workspaces/providers/dataConnectors";
                                 location   = "[parameters('workspace-location')]";
                                 kind       = $connectorData.kind;
@@ -1094,7 +1094,7 @@ foreach ($inputFile in $(Get-ChildItem $path)) {
                             $newAnalyticRule = [PSCustomObject]@{
                                 type       = "Microsoft.OperationalInsights/workspaces/providers/alertRules";
                                 name       = "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/',parameters('analytic$analyticRuleCounter-id'))]";
-                                apiVersion = "2021-03-01-preview";
+                                apiVersion = "2022-11-01";
                                 kind       = "Scheduled";
                                 location   = "[parameters('workspace-location')]";
                                 properties = $alertRule;
@@ -1228,7 +1228,7 @@ foreach ($inputFile in $(Get-ChildItem $path)) {
 
                 $newMetadata = [PSCustomObject]@{
                     type       = "Microsoft.OperationalInsights/workspaces/providers/metadata";
-                    apiVersion = "2021-03-01-preview";
+                    apiVersion = "2020-08-01";
                     properties = [PSCustomObject] @{
                         version = $contentToImport.Version;
                         kind    = "Solution";
