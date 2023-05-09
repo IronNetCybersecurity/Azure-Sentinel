@@ -1,16 +1,16 @@
 {
 	"publisherId": "ironnetcybersecurity1585849518753",
-	"offerId": "irondefense-for-sentinel",
+	"offerId": "irondefense_sentinel_solution",
 	"firstPublishDate": "2021-10-18",
 	"providers": ["IronNet"],
 	"categories": {
-		"domains" : ["Security – Network"],
+		"domains" : ["Compute – Security"],
 		"verticals": []
 	},
 	"support": {
-	  "name": "Microsoft Corporation",
-	  "email": "support@microsoft.com",
-	  "tier": "Microsoft",
-	  "link": "https://support.microsoft.com"
+	  "name": "Ecosystems & Integrations - support@ironnet.com",
+	  "email": "support@ironnet.com",
+	  "tier": "IronNet",
+	  "link": "https://www.ironnet.com/"
 	}
 }
