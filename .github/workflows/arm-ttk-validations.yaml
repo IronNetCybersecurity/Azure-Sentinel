@@ -62,9 +62,9 @@ jobs:
             Write-Host "SolutionName: $sName"
           }
 
-          Write-Output "::set-output name=solutionName::$sName"
-          Write-Output "::set-output name=mainTemplateChanged::$hasmainTemplateChanged"
-          Write-Output "::set-output name=createUiChanged::$hasCreateUiDefinitionTemplateChanged"
+          Write-Output "solutionName$sName" >> $env:GITHUB_OUTPUT
+          Write-Output "mainTemplateChanged=$hasmainTemplateChanged">> $env:GITHUB_OUTPUT
+          Write-Output "createUiChanged=$hasCreateUiDefinitionTemplateChanged">> $env:GITHUB_OUTPUT
 
       - uses: docker/build-push-action@v2
         id: publishGithubPackage
