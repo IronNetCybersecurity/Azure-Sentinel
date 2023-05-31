@@ -62,7 +62,7 @@ jobs:
             Write-Host "SolutionName: $sName"
           }
 
-          Write-Output "solutionName$sName" >> $env:GITHUB_OUTPUT
+          Write-Output "solutionName=$sName" >> $env:GITHUB_OUTPUT
           Write-Output "mainTemplateChanged=$hasmainTemplateChanged">> $env:GITHUB_OUTPUT
           Write-Output "createUiChanged=$hasCreateUiDefinitionTemplateChanged">> $env:GITHUB_OUTPUT
 
