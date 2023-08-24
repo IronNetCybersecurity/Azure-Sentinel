@@ -1,0 +1,1655 @@
+{
+    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":  "1.0.0.0",
+    "metadata":  {
+        "title":  "",
+        "description":  "",
+        "prerequisites":  "",
+        "postDeployment":  [
+        ],
+        "prerequisitesDeployTemplateFile":  "",
+        "lastUpdateTime":  "",
+        "entities":  [
+        ],
+        "tags":  [
+        ],
+        "support":  {
+            "tier":  "community",
+            "armtemplate":  "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+        },
+        "author":  {
+            "name":  ""
+        }
+    },
+    "parameters":  {
+        "PlaybookName":  {
+            "defaultValue":  "UpdateAzureSentinelIncidentsOld",
+            "type":  "string"
+        },
+        "AzureManagementEndpoint":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for AzureManagementEndpoint"
+            }
+        },
+        "IronNetUrl":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for IronNetUrl"
+            }
+        },
+        "LoginEndpoint":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for LoginEndpoint"
+            }
+        },
+        "Password":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for Password"
+            }
+        },
+        "ResourceGroup":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for ResourceGroup"
+            }
+        },
+        "ResourceGroupId":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for ResourceGroupId"
+            }
+        },
+        "ShareCommentWithIronDome":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for ShareCommentWithIronDome"
+            }
+        },
+        "TenantId":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for TenantId"
+            }
+        },
+        "Username":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for Username"
+            }
+        },
+        "client_id":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for client_id"
+            }
+        },
+        "client_secret":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for client_secret"
+            }
+        },
+        "workspace_name":  {
+            "type":  "string",
+            "metadata":  {
+                "description":  "Enter value for workspace_name"
+            }
+        }
+    },
+    "variables":  {
+        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]"
+    },
+    "resources":  [
+        {
+            "properties":  {
+                "provisioningState":  "Succeeded",
+                "state":  "Enabled",
+                "definition":  {
+                    "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion":  "1.0.0.0",
+                    "parameters":  {
+                        "$connections":  {
+                            "defaultValue":  {
+                            },
+                            "type":  "Object"
+                        },
+                        "AzureManagementEndpoint":  {
+                            "defaultValue":  "[parameters('AzureManagementEndpoint')]",
+                            "type":  "string"
+                        },
+                        "IronNetUrl":  {
+                            "defaultValue":  "[parameters('IronNetUrl')]",
+                            "type":  "string"
+                        },
+                        "LoginEndpoint":  {
+                            "defaultValue":  "[parameters('LoginEndpoint')]",
+                            "type":  "string"
+                        },
+                        "Password":  {
+                            "defaultValue":  "[parameters('Password')]",
+                            "type":  "string"
+                        },
+                        "ResourceGroup":  {
+                            "defaultValue":  "[parameters('ResourceGroup')]",
+                            "type":  "string"
+                        },
+                        "ResourceGroupId":  {
+                            "defaultValue":  "[parameters('ResourceGroupId')]",
+                            "type":  "string"
+                        },
+                        "ShareCommentWithIronDome":  {
+                            "defaultValue":  "[parameters('ShareCommentWithIronDome')]",
+                            "type":  "string"
+                        },
+                        "TenantId":  {
+                            "defaultValue":  "[parameters('TenantId')]",
+                            "type":  "string"
+                        },
+                        "Username":  {
+                            "defaultValue":  "[parameters('Username')]",
+                            "type":  "string"
+                        },
+                        "client_id":  {
+                            "defaultValue":  "[parameters('client_id')]",
+                            "type":  "string"
+                        },
+                        "client_secret":  {
+                            "defaultValue":  "[parameters('client_secret')]",
+                            "type":  "string"
+                        },
+                        "workspace_name":  {
+                            "defaultValue":  "[parameters('workspace_name')]",
+                            "type":  "string"
+                        }
+                    },
+                    "triggers":  {
+                        "When_a_response_to_an_Azure_Sentinel_alert_is_triggered":  {
+                            "type":  "ApiConnectionWebhook",
+                            "inputs":  {
+                                "body":  {
+                                    "callback_url":  "@{listCallbackUrl()}"
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "path":  "/subscribe"
+                            }
+                        }
+                    },
+                    "actions":  {
+                        "Check_if_IronNet_Alert_details_exists_in_sentinel_Alert":  {
+                            "actions":  {
+                                "Check_for_an_Alert_or_Event":  {
+                                    "actions":  {
+                                        "Check_if_Sentinel_Incident_Exists":  {
+                                            "actions":  {
+                                                "Fetch_IronDefense_Severity":  {
+                                                    "foreach":  "@body('Extract_IronNet_Alert_details_from_Sentinel_Alert')?['AnalystRating']",
+                                                    "actions":  {
+                                                        "Map_IronNet_Severity_to_Azure_Sentinel_Severity":  {
+                                                            "runAfter":  {
+                                                            },
+                                                            "cases":  {
+                                                                "Case":  {
+                                                                    "case":  "Low",
+                                                                    "actions":  {
+                                                                        "Map_Severity_'Low'":  {
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "SetVariable",
+                                                                            "inputs":  {
+                                                                                "name":  "Severity",
+                                                                                "value":  "Low"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "Case_2":  {
+                                                                    "case":  "Medium",
+                                                                    "actions":  {
+                                                                        "Map_Severity_'Medium'":  {
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "SetVariable",
+                                                                            "inputs":  {
+                                                                                "name":  "Severity",
+                                                                                "value":  "Medium"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "Case_3":  {
+                                                                    "case":  "High",
+                                                                    "actions":  {
+                                                                        "Map_Severity_'High'":  {
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "SetVariable",
+                                                                            "inputs":  {
+                                                                                "name":  "Severity",
+                                                                                "value":  "High"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "Case_4":  {
+                                                                    "case":  "Very-High",
+                                                                    "actions":  {
+                                                                        "Map_Severity_'Very-High'":  {
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "SetVariable",
+                                                                            "inputs":  {
+                                                                                "name":  "Severity",
+                                                                                "value":  "High"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            "expression":  "@items('Fetch_IronDefense_Severity')",
+                                                            "type":  "Switch"
+                                                        }
+                                                    },
+                                                    "runAfter":  {
+                                                        "Map_IronNet_Status_to_Azure_Sentinel_Status":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "Foreach"
+                                                },
+                                                "For_each_Sentinel_Incident":  {
+                                                    "foreach":  "@body('Parse_Sentinel_Incident')?['value']",
+                                                    "actions":  {
+                                                        "Check_if_Incident_needs_to_be_updated":  {
+                                                            "actions":  {
+                                                                "Check_for_Classification":  {
+                                                                    "actions":  {
+                                                                        "Close_incident":  {
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "ApiConnection",
+                                                                            "inputs":  {
+                                                                                "body":  {
+                                                                                    "classification":  {
+                                                                                        "ClassificationAndReason":  "@variables('Classification')",
+                                                                                        "ClassificationReasonText":  "This incident was closed in IronVue. View more details at @{variables('vueUrl')}."
+                                                                                    },
+                                                                                    "incidentArmId":  "@items('For_each_Sentinel_Incident')?['id']",
+                                                                                    "severity":  "@variables('Severity')",
+                                                                                    "status":  "Closed"
+                                                                                },
+                                                                                "host":  {
+                                                                                    "connection":  {
+                                                                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                                                    }
+                                                                                },
+                                                                                "method":  "put",
+                                                                                "path":  "/Incidents"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "runAfter":  {
+                                                                    },
+                                                                    "else":  {
+                                                                        "actions":  {
+                                                                            "Add_comment_to_incident_(V3)_2":  {
+                                                                                "runAfter":  {
+                                                                                    "Update_incident":  [
+                                                                                        "Succeeded"
+                                                                                    ]
+                                                                                },
+                                                                                "type":  "ApiConnection",
+                                                                                "inputs":  {
+                                                                                    "body":  {
+                                                                                        "incidentArmId":  "@items('For_each_Sentinel_Incident')?['id']",
+                                                                                        "message":  "\u003cp\u003eThis incident was modified in IronVue. The status was updated from \"@{items('For_each_Sentinel_Incident')?['properties']?['status']}\" to \"@{variables('Status')}\". View more details at @{variables('vueUrl')}.\u003c/p\u003e"
+                                                                                    },
+                                                                                    "host":  {
+                                                                                        "connection":  {
+                                                                                            "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                                                        }
+                                                                                    },
+                                                                                    "method":  "post",
+                                                                                    "path":  "/Incidents/Comment"
+                                                                                }
+                                                                            },
+                                                                            "Update_incident":  {
+                                                                                "runAfter":  {
+                                                                                },
+                                                                                "type":  "ApiConnection",
+                                                                                "inputs":  {
+                                                                                    "body":  {
+                                                                                        "incidentArmId":  "@items('For_each_Sentinel_Incident')?['id']",
+                                                                                        "severity":  "@variables('Severity')",
+                                                                                        "status":  "@variables('Status')"
+                                                                                    },
+                                                                                    "host":  {
+                                                                                        "connection":  {
+                                                                                            "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                                                        }
+                                                                                    },
+                                                                                    "method":  "put",
+                                                                                    "path":  "/Incidents"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "expression":  {
+                                                                        "and":  [
+                                                                            {
+                                                                                "equals":  [
+                                                                                    "@variables('Status')",
+                                                                                    "Closed"
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "type":  "If"
+                                                                }
+                                                            },
+                                                            "runAfter":  {
+                                                            },
+                                                            "expression":  {
+                                                                "or":  [
+                                                                    {
+                                                                        "not":  {
+                                                                            "equals":  [
+                                                                                "@variables('Status')",
+                                                                                "@items('For_each_Sentinel_Incident')?['properties']?['status']"
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "type":  "If"
+                                                        },
+                                                        "Condition":  {
+                                                            "actions":  {
+                                                                "Check_if_Irondefense_Alert_has_Comments":  {
+                                                                    "actions":  {
+                                                                        "For_each_Comment":  {
+                                                                            "foreach":  "@body('Parse_Get_Alert_IronDome_Information')?['community_comments']",
+                                                                            "actions":  {
+                                                                                "Should_publish_comment":  {
+                                                                                    "actions":  {
+                                                                                        "Add_comment_to_incident_(V3)":  {
+                                                                                            "runAfter":  {
+                                                                                            },
+                                                                                            "type":  "ApiConnection",
+                                                                                            "inputs":  {
+                                                                                                "body":  {
+                                                                                                    "incidentArmId":  "@items('For_each_Sentinel_Incident')?['id']",
+                                                                                                    "message":  "\u003cp\u003e@{items('For_each_Comment')?['comment']}\u003c/p\u003e"
+                                                                                                },
+                                                                                                "host":  {
+                                                                                                    "connection":  {
+                                                                                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                                                                    }
+                                                                                                },
+                                                                                                "method":  "post",
+                                                                                                "path":  "/Incidents/Comment"
+                                                                                            }
+                                                                                        }
+                                                                                    },
+                                                                                    "runAfter":  {
+                                                                                    },
+                                                                                    "else":  {
+                                                                                        "actions":  {
+                                                                                            "Older_Comments":  {
+                                                                                                "runAfter":  {
+                                                                                                },
+                                                                                                "type":  "SetVariable",
+                                                                                                "inputs":  {
+                                                                                                    "name":  "Message",
+                                                                                                    "value":  "Olders Comments"
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    },
+                                                                                    "expression":  {
+                                                                                        "and":  [
+                                                                                            {
+                                                                                                "greater":  [
+                                                                                                    "@items('For_each_Comment')?['created']",
+                                                                                                    "@items('For_each_Sentinel_Incident')?['properties']?['lastActivityTimeUtc']"
+                                                                                                ]
+                                                                                            },
+                                                                                            {
+                                                                                                "equals":  [
+                                                                                                    "@items('For_each_Comment')?['enterprise']",
+                                                                                                    false
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    },
+                                                                                    "type":  "If"
+                                                                                }
+                                                                            },
+                                                                            "runAfter":  {
+                                                                            },
+                                                                            "type":  "Foreach"
+                                                                        }
+                                                                    },
+                                                                    "runAfter":  {
+                                                                        "Parse_Get_Alert_IronDome_Information":  [
+                                                                            "Succeeded"
+                                                                        ]
+                                                                    },
+                                                                    "else":  {
+                                                                        "actions":  {
+                                                                            "No_Comments":  {
+                                                                                "runAfter":  {
+                                                                                },
+                                                                                "type":  "SetVariable",
+                                                                                "inputs":  {
+                                                                                    "name":  "Message",
+                                                                                    "value":  "No Comments available for Alert @{variables('IronNet Alert Id')}"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "expression":  {
+                                                                        "and":  [
+                                                                            {
+                                                                                "greater":  [
+                                                                                    "@length(body('Parse_Get_Alert_IronDome_Information')?['community_comments'])",
+                                                                                    0
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "type":  "If"
+                                                                },
+                                                                "Get_Alert_IronDome_Information":  {
+                                                                    "runAfter":  {
+                                                                    },
+                                                                    "type":  "Http",
+                                                                    "inputs":  {
+                                                                        "authentication":  {
+                                                                            "password":  "@parameters('Password')",
+                                                                            "type":  "Basic",
+                                                                            "username":  "@parameters('Username')"
+                                                                        },
+                                                                        "body":  {
+                                                                            "alert_id":  "@variables('IronNet Alert Id')"
+                                                                        },
+                                                                        "headers":  {
+                                                                            "Content-Type":  "application/json"
+                                                                        },
+                                                                        "method":  "POST",
+                                                                        "uri":  "@{parameters('IronNetUrl')}/IronApi/GetAlertIronDomeInformationn"
+                                                                    }
+                                                                },
+                                                                "Parse_Get_Alert_IronDome_Information":  {
+                                                                    "runAfter":  {
+                                                                        "Get_Alert_IronDome_Information":  [
+                                                                            "Succeeded"
+                                                                        ]
+                                                                    },
+                                                                    "type":  "ParseJson",
+                                                                    "inputs":  {
+                                                                        "content":  "@body('Get_Alert_IronDome_Information')",
+                                                                        "schema":  {
+                                                                            "properties":  {
+                                                                                "cognitive_system_score":  {
+                                                                                    "type":  "integer"
+                                                                                },
+                                                                                "community_comments":  {
+                                                                                    "items":  {
+                                                                                        "properties":  {
+                                                                                            "comment":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                            "created":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                            "dome_tags":  {
+                                                                                                "items":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                                "type":  "array"
+                                                                                            },
+                                                                                            "enterprise":  {
+                                                                                                "type":  "boolean"
+                                                                                            },
+                                                                                            "self":  {
+                                                                                                "type":  "boolean"
+                                                                                            }
+                                                                                        },
+                                                                                        "required":  [
+                                                                                            "created",
+                                                                                            "comment",
+                                                                                            "dome_tags",
+                                                                                            "enterprise",
+                                                                                            "self"
+                                                                                        ],
+                                                                                        "type":  "object"
+                                                                                    },
+                                                                                    "type":  "array"
+                                                                                },
+                                                                                "correlation_participation":  {
+                                                                                    "items":  {
+                                                                                        "properties":  {
+                                                                                            "dome_tag":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                            "ip":  {
+                                                                                                "properties":  {
+                                                                                                    "activity_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    },
+                                                                                                    "benign_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    },
+                                                                                                    "comments_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    },
+                                                                                                    "first_seen":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                                    "last_seen":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                                    "malicious_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    },
+                                                                                                    "resource_owner":  {
+                                                                                                        "type":  "boolean"
+                                                                                                    },
+                                                                                                    "suspicious_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    },
+                                                                                                    "whitelisted_count":  {
+                                                                                                        "type":  "integer"
+                                                                                                    }
+                                                                                                },
+                                                                                                "type":  "object"
+                                                                                            }
+                                                                                        },
+                                                                                        "required":  [
+                                                                                            "dome_tag",
+                                                                                            "behavior",
+                                                                                            "domain",
+                                                                                            "ip"
+                                                                                        ],
+                                                                                        "type":  "object"
+                                                                                    },
+                                                                                    "type":  "array"
+                                                                                },
+                                                                                "correlations":  {
+                                                                                    "items":  {
+                                                                                        "properties":  {
+                                                                                            "correlations":  {
+                                                                                                "items":  {
+                                                                                                    "properties":  {
+                                                                                                        "community_correlations":  {
+                                                                                                            "type":  "integer"
+                                                                                                        },
+                                                                                                        "enterprise_correlations":  {
+                                                                                                            "type":  "integer"
+                                                                                                        },
+                                                                                                        "ip":  {
+                                                                                                            "type":  "string"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "required":  [
+                                                                                                        "enterprise_correlations",
+                                                                                                        "community_correlations"
+                                                                                                    ],
+                                                                                                    "type":  "object"
+                                                                                                },
+                                                                                                "type":  "array"
+                                                                                            },
+                                                                                            "dome_tag":  {
+                                                                                                "type":  "string"
+                                                                                            }
+                                                                                        },
+                                                                                        "required":  [
+                                                                                            "dome_tag",
+                                                                                            "correlations"
+                                                                                        ],
+                                                                                        "type":  "object"
+                                                                                    },
+                                                                                    "type":  "array"
+                                                                                },
+                                                                                "dome_notifications":  {
+                                                                                    "type":  "array"
+                                                                                }
+                                                                            },
+                                                                            "type":  "object"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            "runAfter":  {
+                                                                "Check_if_Incident_needs_to_be_updated":  [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "expression":  {
+                                                                "and":  [
+                                                                    {
+                                                                        "equals":  [
+                                                                            "@parameters('ShareCommentWithIronDome')",
+                                                                            "@true"
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "type":  "If"
+                                                        }
+                                                    },
+                                                    "runAfter":  {
+                                                        "Fetch_IronDefense_Severity":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "Foreach"
+                                                },
+                                                "Get_IronNet_Alert":  {
+                                                    "runAfter":  {
+                                                        "Parse_IronAPI_token":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "Http",
+                                                    "inputs":  {
+                                                        "body":  {
+                                                            "alert_id":  [
+                                                                "@{variables('IronNet Alert Id')}"
+                                                            ]
+                                                        },
+                                                        "headers":  {
+                                                            "Authorization":  "Bearer @{body('Parse_IronAPI_token')?['token']}",
+                                                            "Content-Type":  "application/json "
+                                                        },
+                                                        "method":  "POST",
+                                                        "uri":  "@{parameters('IronNetUrl')}/IronApi/GetAlerts"
+                                                    }
+                                                },
+                                                "Login_to_IronAPI":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "Http",
+                                                    "inputs":  {
+                                                        "authentication":  {
+                                                            "password":  "@parameters('Password')",
+                                                            "type":  "Basic",
+                                                            "username":  "@parameters('Username')"
+                                                        },
+                                                        "headers":  {
+                                                            "Content-Type":  "application/json"
+                                                        },
+                                                        "method":  "POST",
+                                                        "uri":  "@{parameters('IronNetUrl')}/IronApi/Login"
+                                                    }
+                                                },
+                                                "Map_IronNet_Status_to_Azure_Sentinel_Status":  {
+                                                    "runAfter":  {
+                                                        "Set_most_recent_IronNet_analyst_severity_and_status":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "cases":  {
+                                                        "Case":  {
+                                                            "case":  "STATUS_AWAITING_REVIEW",
+                                                            "actions":  {
+                                                                "Map_Status_'STATUS_AWAITING_REVIEW'":  {
+                                                                    "runAfter":  {
+                                                                    },
+                                                                    "type":  "SetVariable",
+                                                                    "inputs":  {
+                                                                        "name":  "Status",
+                                                                        "value":  "New"
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "Case_2":  {
+                                                            "case":  "STATUS_UNDER_REVIEW",
+                                                            "actions":  {
+                                                                "Map_Status_'STATUS_UNDER_REVIEW'":  {
+                                                                    "runAfter":  {
+                                                                    },
+                                                                    "type":  "SetVariable",
+                                                                    "inputs":  {
+                                                                        "name":  "Status",
+                                                                        "value":  "Active"
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "Case_3":  {
+                                                            "case":  "STATUS_CLOSED",
+                                                            "actions":  {
+                                                                "Map_Classification":  {
+                                                                    "runAfter":  {
+                                                                        "Map_Status_'STATUS_CLOSED'":  [
+                                                                            "Succeeded"
+                                                                        ]
+                                                                    },
+                                                                    "cases":  {
+                                                                        "Case":  {
+                                                                            "case":  "SEVERITY_UNDECIDED",
+                                                                            "actions":  {
+                                                                                "Map_Classification_'SEVERITY_UNDECIDED'":  {
+                                                                                    "runAfter":  {
+                                                                                    },
+                                                                                    "type":  "SetVariable",
+                                                                                    "inputs":  {
+                                                                                        "name":  "Classification",
+                                                                                        "value":  "Undetermined"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "Case_2":  {
+                                                                            "case":  "SEVERITY_BENIGN",
+                                                                            "actions":  {
+                                                                                "Map_Classification_'SEVERITY_BENIGN'":  {
+                                                                                    "runAfter":  {
+                                                                                    },
+                                                                                    "type":  "SetVariable",
+                                                                                    "inputs":  {
+                                                                                        "name":  "Classification",
+                                                                                        "value":  "FalsePositive - IncorrectAlertLogic"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "Case_3":  {
+                                                                            "case":  "SEVERITY_MALICIOUS",
+                                                                            "actions":  {
+                                                                                "Map_Classification_'SEVERITY_MALICIOUS'":  {
+                                                                                    "runAfter":  {
+                                                                                    },
+                                                                                    "type":  "SetVariable",
+                                                                                    "inputs":  {
+                                                                                        "name":  "Classification",
+                                                                                        "value":  "BenignPositive - SuspiciousButExpected"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "Case_4":  {
+                                                                            "case":  "SEVERITY_SUSPICIOUS",
+                                                                            "actions":  {
+                                                                                "Map_Classification_'SEVERITY_SUSPICIOUS'":  {
+                                                                                    "runAfter":  {
+                                                                                    },
+                                                                                    "type":  "SetVariable",
+                                                                                    "inputs":  {
+                                                                                        "name":  "Classification",
+                                                                                        "value":  "TruePositive - SuspiciousActivity"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "expression":  "@variables('Analyst Severity')",
+                                                                    "type":  "Switch"
+                                                                },
+                                                                "Map_Status_'STATUS_CLOSED'":  {
+                                                                    "runAfter":  {
+                                                                    },
+                                                                    "type":  "SetVariable",
+                                                                    "inputs":  {
+                                                                        "name":  "Status",
+                                                                        "value":  "Closed"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "default":  {
+                                                        "actions":  {
+                                                            "Map_Other_Statuses":  {
+                                                                "runAfter":  {
+                                                                },
+                                                                "type":  "SetVariable",
+                                                                "inputs":  {
+                                                                    "name":  "Status",
+                                                                    "value":  "New"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "expression":  "@variables('IronNet Alert Status')",
+                                                    "type":  "Switch"
+                                                },
+                                                "Parse_IronAPI_token":  {
+                                                    "runAfter":  {
+                                                        "Login_to_IronAPI":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "ParseJson",
+                                                    "inputs":  {
+                                                        "content":  "@body('Login_to_IronAPI')",
+                                                        "schema":  {
+                                                            "properties":  {
+                                                                "token":  {
+                                                                    "type":  "string"
+                                                                }
+                                                            },
+                                                            "type":  "object"
+                                                        }
+                                                    }
+                                                },
+                                                "Parse_IronNet_Alert":  {
+                                                    "runAfter":  {
+                                                        "Get_IronNet_Alert":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "ParseJson",
+                                                    "inputs":  {
+                                                        "content":  "@body('Get_IronNet_Alert')",
+                                                        "schema":  {
+                                                            "properties":  {
+                                                                "alerts":  {
+                                                                    "items":  {
+                                                                        "properties":  {
+                                                                            "aggregation_criteria":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "analyst_expectation":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "analyst_severity":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "category":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "created":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "event_count":  {
+                                                                                "type":  "integer"
+                                                                            },
+                                                                            "first_event_created":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "id":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "last_event_created":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "raw_data_formats":  {
+                                                                                "items":  {
+                                                                                    "type":  "string"
+                                                                                },
+                                                                                "type":  "array"
+                                                                            },
+                                                                            "severity":  {
+                                                                                "type":  "integer"
+                                                                            },
+                                                                            "status":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "sub_category":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "updated":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "vue_url":  {
+                                                                                "type":  "string"
+                                                                            }
+                                                                        },
+                                                                        "required":  [
+                                                                            "id",
+                                                                            "category",
+                                                                            "sub_category",
+                                                                            "severity",
+                                                                            "status",
+                                                                            "analyst_severity",
+                                                                            "analyst_expectation",
+                                                                            "created",
+                                                                            "updated",
+                                                                            "event_count",
+                                                                            "first_event_created",
+                                                                            "last_event_created",
+                                                                            "raw_data_formats",
+                                                                            "aggregation_criteria",
+                                                                            "vue_url"
+                                                                        ],
+                                                                        "type":  "object"
+                                                                    },
+                                                                    "type":  "array"
+                                                                },
+                                                                "constraint":  {
+                                                                    "properties":  {
+                                                                        "limit":  {
+                                                                            "type":  "integer"
+                                                                        },
+                                                                        "offset":  {
+                                                                            "type":  "integer"
+                                                                        },
+                                                                        "total":  {
+                                                                            "type":  "string"
+                                                                        }
+                                                                    },
+                                                                    "type":  "object"
+                                                                }
+                                                            },
+                                                            "type":  "object"
+                                                        }
+                                                    }
+                                                },
+                                                "Set_most_recent_IronNet_analyst_severity_and_status":  {
+                                                    "foreach":  "@body('Parse_IronNet_Alert')?['alerts']",
+                                                    "actions":  {
+                                                        "Set_Analyst_Severity":  {
+                                                            "runAfter":  {
+                                                            },
+                                                            "type":  "SetVariable",
+                                                            "inputs":  {
+                                                                "name":  "Analyst Severity",
+                                                                "value":  "@items('Set_most_recent_IronNet_analyst_severity_and_status')?['analyst_severity']"
+                                                            }
+                                                        },
+                                                        "Set_IronNet_Alert_Status":  {
+                                                            "runAfter":  {
+                                                                "Set_Analyst_Severity":  [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type":  "SetVariable",
+                                                            "inputs":  {
+                                                                "name":  "IronNet Alert Status",
+                                                                "value":  "@items('Set_most_recent_IronNet_analyst_severity_and_status')?['status']"
+                                                            }
+                                                        }
+                                                    },
+                                                    "runAfter":  {
+                                                        "Parse_IronNet_Alert":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "Foreach"
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "Parse_Sentinel_Incident":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "else":  {
+                                                "actions":  {
+                                                    "No_Sentinel_Incidents":  {
+                                                        "runAfter":  {
+                                                        },
+                                                        "type":  "SetVariable",
+                                                        "inputs":  {
+                                                            "name":  "Message",
+                                                            "value":  "No Sentinel Incidents present for the alert "
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "expression":  {
+                                                "and":  [
+                                                    {
+                                                        "greater":  [
+                                                            "@length(body('Parse_Sentinel_Incident')?['value'])",
+                                                            0
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "type":  "If"
+                                        },
+                                        "For_each_Analyst_Rating":  {
+                                            "foreach":  "@body('Extract_IronNet_Alert_details_from_Sentinel_Alert')?['AnalystRating']",
+                                            "actions":  {
+                                                "Set_Analyst_Rating":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "SetVariable",
+                                                    "inputs":  {
+                                                        "name":  "Analyst Rating",
+                                                        "value":  "@{items('For_each_Analyst_Rating')}"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                            },
+                                            "type":  "Foreach"
+                                        },
+                                        "For_each_vueUrl":  {
+                                            "foreach":  "@body('Extract_IronNet_Alert_details_from_Sentinel_Alert')?['IronVueUrl']",
+                                            "actions":  {
+                                                "Set_vueUrl":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "SetVariable",
+                                                    "inputs":  {
+                                                        "name":  "vueUrl",
+                                                        "value":  "@{items('For_each_vueUrl')}"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "For_each_Analyst_Rating":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Foreach"
+                                        },
+                                        "Generate_the_token_for_Azure_Sentinel_Incident":  {
+                                            "runAfter":  {
+                                                "For_each_vueUrl":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Http",
+                                            "inputs":  {
+                                                "body":  "grant_type=client_credentials\u0026client_id=@{parameters('client_id')}\u0026client_secret=@{parameters('client_secret')}\u0026resource=https://@{parameters('AzureManagementEndpoint')}",
+                                                "headers":  {
+                                                    "Content-Type":  "application/x-www-form-urlencoded"
+                                                },
+                                                "method":  "POST",
+                                                "uri":  "https://@{parameters('LoginEndpoint')}/@{parameters('TenantId')}/oauth2/token"
+                                            }
+                                        },
+                                        "Get_Sentinel_Incident":  {
+                                            "runAfter":  {
+                                                "Parse_Token":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Http",
+                                            "inputs":  {
+                                                "headers":  {
+                                                    "Authorization":  "Bearer @{body('Parse_Token')?['access_token']}",
+                                                    "Content-Type":  "application/json"
+                                                },
+                                                "method":  "GET",
+                                                "uri":  "https://@{parameters('AzureManagementEndpoint')}/@{parameters('ResourceGroupId')}/providers/Microsoft.OperationalInsights/workspaces/@{parameters('workspace_name')}/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01\u0026$filter=endsWith(properties/title,'(@{variables('IronNet Alert Id')})')"
+                                            }
+                                        },
+                                        "Parse_Sentinel_Incident":  {
+                                            "runAfter":  {
+                                                "Get_Sentinel_Incident":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "ParseJson",
+                                            "inputs":  {
+                                                "content":  "@body('Get_Sentinel_Incident')",
+                                                "schema":  {
+                                                    "properties":  {
+                                                        "value":  {
+                                                            "items":  {
+                                                                "properties":  {
+                                                                    "etag":  {
+                                                                        "type":  "string"
+                                                                    },
+                                                                    "id":  {
+                                                                        "type":  "string"
+                                                                    },
+                                                                    "name":  {
+                                                                        "type":  "string"
+                                                                    },
+                                                                    "properties":  {
+                                                                        "properties":  {
+                                                                            "additionalData":  {
+                                                                                "properties":  {
+                                                                                    "alertProductNames":  {
+                                                                                        "items":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                                        "type":  "array"
+                                                                                    },
+                                                                                    "alertsCount":  {
+                                                                                        "type":  "integer"
+                                                                                    },
+                                                                                    "bookmarksCount":  {
+                                                                                        "type":  "integer"
+                                                                                    },
+                                                                                    "commentsCount":  {
+                                                                                        "type":  "integer"
+                                                                                    },
+                                                                                    "tactics":  {
+                                                                                        "type":  "array"
+                                                                                    }
+                                                                                },
+                                                                                "type":  "object"
+                                                                            },
+                                                                            "classification":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "classificationComment":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "classificationReason":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "createdTimeUtc":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "description":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "firstActivityTimeUtc":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "incidentNumber":  {
+                                                                                "type":  "integer"
+                                                                            },
+                                                                            "incidentUrl":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "labels":  {
+                                                                                "type":  "array"
+                                                                            },
+                                                                            "lastActivityTimeUtc":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "lastModifiedTimeUtc":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "owner":  {
+                                                                                "type":  "object"
+                                                                            },
+                                                                            "relatedAnalyticRuleIds":  {
+                                                                                "items":  {
+                                                                                    "type":  "string"
+                                                                                },
+                                                                                "type":  "array"
+                                                                            },
+                                                                            "severity":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "status":  {
+                                                                                "type":  "string"
+                                                                            },
+                                                                            "title":  {
+                                                                                "type":  "string"
+                                                                            }
+                                                                        },
+                                                                        "type":  "object"
+                                                                    },
+                                                                    "type":  {
+                                                                        "type":  "string"
+                                                                    }
+                                                                },
+                                                                "required":  [
+                                                                    "id",
+                                                                    "name",
+                                                                    "etag",
+                                                                    "type",
+                                                                    "properties"
+                                                                ],
+                                                                "type":  "object"
+                                                            },
+                                                            "type":  "array"
+                                                        }
+                                                    },
+                                                    "type":  "object"
+                                                }
+                                            }
+                                        },
+                                        "Parse_Token":  {
+                                            "runAfter":  {
+                                                "Generate_the_token_for_Azure_Sentinel_Incident":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "ParseJson",
+                                            "inputs":  {
+                                                "content":  "@body('Generate_the_token_for_Azure_Sentinel_Incident')",
+                                                "schema":  {
+                                                    "properties":  {
+                                                        "access_token":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "expires_in":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "expires_on":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "ext_expires_in":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "not_before":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "resource":  {
+                                                            "type":  "string"
+                                                        },
+                                                        "token_type":  {
+                                                            "type":  "string"
+                                                        }
+                                                    },
+                                                    "type":  "object"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "runAfter":  {
+                                        "For_each_IronDefense_Alert":  [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else":  {
+                                        "actions":  {
+                                            "Sentinel_Alert_contains_IronNet_Event_":  {
+                                                "runAfter":  {
+                                                },
+                                                "type":  "SetVariable",
+                                                "inputs":  {
+                                                    "name":  "Message",
+                                                    "value":  "This is an Event belonging to Alert @{variables('IronNet Alert Id')}"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression":  {
+                                        "and":  [
+                                            {
+                                                "contains":  [
+                                                    "@body('Parse_Extended_Properties')?['Custom Details']",
+                                                    "IronDefenseStatus"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type":  "If"
+                                },
+                                "Extract_IronNet_Alert_details_from_Sentinel_Alert":  {
+                                    "runAfter":  {
+                                    },
+                                    "type":  "ParseJson",
+                                    "inputs":  {
+                                        "content":  "@body('Parse_Extended_Properties')?['Custom Details']",
+                                        "schema":  {
+                                            "properties":  {
+                                                "AlertCreatedTime":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                },
+                                                "AnalystRating":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                },
+                                                "AnalystSeverity":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                },
+                                                "IDAlertUuidStr":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                },
+                                                "IronDefenseStatus":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                },
+                                                "IronVueUrl":  {
+                                                    "items":  {
+                                                        "type":  "string"
+                                                    },
+                                                    "type":  "array"
+                                                }
+                                            },
+                                            "type":  "object"
+                                        }
+                                    }
+                                },
+                                "For_each_IronDefense_Alert":  {
+                                    "foreach":  "@body('Extract_IronNet_Alert_details_from_Sentinel_Alert')?['IDAlertUuidStr']",
+                                    "actions":  {
+                                        "Set_IronNet_Alert_Id":  {
+                                            "runAfter":  {
+                                            },
+                                            "type":  "SetVariable",
+                                            "inputs":  {
+                                                "name":  "IronNet Alert Id",
+                                                "value":  "@{items('For_each_IronDefense_Alert')}"
+                                            }
+                                        }
+                                    },
+                                    "runAfter":  {
+                                        "Extract_IronNet_Alert_details_from_Sentinel_Alert":  [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type":  "Foreach"
+                                }
+                            },
+                            "runAfter":  {
+                                "Parse_Extended_Properties":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else":  {
+                                "actions":  {
+                                    "No_Notifications":  {
+                                        "runAfter":  {
+                                        },
+                                        "type":  "SetVariable",
+                                        "inputs":  {
+                                            "name":  "Message",
+                                            "value":  "No Notifications"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression":  {
+                                "and":  [
+                                    {
+                                        "not":  {
+                                            "equals":  [
+                                                "@body('Parse_Extended_Properties')?['Custom Details']",
+                                                "2"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "contains":  [
+                                            "@body('Parse_Extended_Properties')?['Custom Details']",
+                                            "IDAlertUuidStr"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type":  "If"
+                        },
+                        "Display_Output_Message":  {
+                            "runAfter":  {
+                                "Check_if_IronNet_Alert_details_exists_in_sentinel_Alert":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Compose",
+                            "inputs":  "@variables('Message')"
+                        },
+                        "Initialize_Analyst_Rating":  {
+                            "runAfter":  {
+                                "Initialize_Severity":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Analyst Rating",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Analyst_Severity":  {
+                            "runAfter":  {
+                                "Initialize_Analyst_Rating":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Analyst Severity",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Classification":  {
+                            "runAfter":  {
+                                "Initialize_IronNet_Alert_Id":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Classification",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Exit":  {
+                            "runAfter":  {
+                                "Initialize_vueUrl":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Exit",
+                                        "type":  "boolean",
+                                        "value":  false
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_IronNet_Alert_Id":  {
+                            "runAfter":  {
+                                "Initialize_variable":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "IronNet Alert Id",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Message":  {
+                            "runAfter":  {
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Message",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Severity":  {
+                            "runAfter":  {
+                                "Initialize_Status":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Severity",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_Status":  {
+                            "runAfter":  {
+                                "Initialize_Message":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Status",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable":  {
+                            "runAfter":  {
+                                "Initialize_Analyst_Severity":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "IronNet Alert Status",
+                                        "type":  "string",
+                                        "value":  "STATUS_NONE"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_vueUrl":  {
+                            "runAfter":  {
+                                "Initialize_Classification":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "vueUrl",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Parse_Extended_Properties":  {
+                            "runAfter":  {
+                                "Initialize_Exit":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ParseJson",
+                            "inputs":  {
+                                "content":  "@triggerBody()?['ExtendedProperties']",
+                                "schema":  {
+                                    "properties":  {
+                                        "Analytic Rule Ids":  {
+                                            "type":  "string"
+                                        },
+                                        "Analytic Rule Name":  {
+                                            "type":  "string"
+                                        },
+                                        "Custom Details":  {
+                                            "type":  "string"
+                                        },
+                                        "Data Sources":  {
+                                            "type":  "string"
+                                        },
+                                        "Event Grouping":  {
+                                            "type":  "string"
+                                        },
+                                        "OriginalQuery":  {
+                                            "type":  "string"
+                                        },
+                                        "ProcessedBySentinel":  {
+                                            "type":  "string"
+                                        },
+                                        "Query":  {
+                                            "type":  "string"
+                                        },
+                                        "Query End Time UTC":  {
+                                            "type":  "string"
+                                        },
+                                        "Query Period":  {
+                                            "type":  "string"
+                                        },
+                                        "Query Start Time UTC":  {
+                                            "type":  "string"
+                                        },
+                                        "Search Query Results Overall Count":  {
+                                            "type":  "string"
+                                        },
+                                        "Trigger Operator":  {
+                                            "type":  "string"
+                                        },
+                                        "Trigger Threshold":  {
+                                            "type":  "string"
+                                        }
+                                    },
+                                    "type":  "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters":  {
+                    "$connections":  {
+                        "value":  {
+                            "azuresentinel":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+                                "connectionProperties":  {
+                                    "authentication":  {
+                                        "type":  "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "name":  "[parameters('PlaybookName')]",
+            "type":  "Microsoft.Logic/workflows",
+            "location":  "[resourceGroup().location]",
+            "tags":  {
+                "hidden-SentinelTemplateName":  "UpdateAzureSentinelIncidentsOld",
+                "hidden-SentinelTemplateVersion":  "1.0"
+            },
+            "identity":  {
+                "type":  "SystemAssigned"
+            },
+            "apiVersion":  "2017-07-01",
+            "dependsOn":  [
+                "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]"
+            ]
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('MicrosoftSentinelConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues":  {
+                },
+                "parameterValueType":  "Alternative",
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+                }
+            }
+        }
+    ]
+}
